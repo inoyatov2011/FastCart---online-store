@@ -1,16 +1,37 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import logo1 from "../../img/Group 1116606595.png"
 import logo3 from "../../img/Wishlist.png"
 import logo5 from "../../img/user.png"
 import logo6 from "../../img/Cart1.png"
 import { Link, Outlet } from "react-router-dom"
 import { Button, Input } from 'antd'
-import { MenuOutlined, CloseOutlined, SendOutlined, FacebookOutlined, TwitterOutlined, InstagramOutlined, LinkedinOutlined, ShoppingCartOutlined, DownOutlined, RightOutlined } from '@ant-design/icons'
+import { MenuOutlined, CloseOutlined, SendOutlined, FacebookOutlined, TwitterOutlined, InstagramOutlined, LinkedinOutlined, DownOutlined } from '@ant-design/icons'
+import { useDispatch, useSelector } from 'react-redux'
 const { Search } = Input
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
+import { getCategory } from '../../api/categoryApi/categoryApi'
+import { getProductsInCart } from '../../api/cartApi/cartApi'
 
 const Layout = () => {
   const [modal, setModal] = useState(false)
   const [modalC, setModalC] = useState(false)
+  const [modalL, setModalL] = useState(false)
+  const { data2 } = useSelector((state) => state.category);
+  const { data } = useSelector((state) => state.cart)
+  const dispatch = useDispatch();
+  let [search, setSearch] = useState("")
+
+  useEffect(() => {
+    dispatch(getCategory());
+    dispatch(getProductsInCart())
+  }, [dispatch]);
 
   return (
     <div>
@@ -29,9 +50,9 @@ const Layout = () => {
               </ul>
               <div className=" gap-[20px]">
                 <Link to={"/wishlist"} onClick={() => setModal(false)}>
-                  <img src={logo3} alt=""  />
+                  <img src={logo3} alt="" />
                 </Link>
-                <Link to={"/cart"}  onClick={() => setModal(false)}>
+                <Link to={"/cart"} onClick={() => setModal(false)}>
                   <img src={logo6} className='ml-[3px]' alt="" />
                 </Link>
                 <Link to={"/account"} onClick={() => setModal(false)}>
@@ -42,6 +63,7 @@ const Layout = () => {
           </div>
         </div>
       )}
+
       {modalC && (
         <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
           <div className="bg-white w-[80%] p-5 rounded-lg">
@@ -50,48 +72,147 @@ const Layout = () => {
             </div>
             <div className='flex items-center justify-between'>
               <ul className="flex flex-col gap-4 text-lg">
-                <li onClick={() => setModalC(false)}>Woman’s Fashion <RightOutlined /></li>
-                <li onClick={() => setModalC(false)}>Men’s Fashion <RightOutlined /></li>
-                <li onClick={() => setModalC(false)}>Electronics</li>
-                <li onClick={() => setModalC(false)}>Home & Lifestyle</li>
-                <li onClick={() => setModalC(false)}>Medicine</li>
-                <li onClick={() => setModalC(false)}>Sports & Outdoor</li>
-                <li onClick={() => setModalC(false)}>Baby’s & Toys</li>
-                <li onClick={() => setModalC(false)}>Groceries & Pets</li>
-                <li onClick={() => setModalC(false)}>Health & Beauty</li>
+                <div>
+                  {data2?.map((e) => {
+                    return (
+
+                      <NavigationMenu>
+                        <NavigationMenuList>
+                          <NavigationMenuItem>
+                            <Link to={"/commerceRroduct"}>
+                              <NavigationMenuTrigger> <li onClick={() => setModalC(false)}>{e.categoryName}</li></NavigationMenuTrigger>
+                            </Link>
+                            <NavigationMenuContent>
+                              <ul className="p-4 w-[200px] flex flex-col gap-2">
+                                {e.subCategories.map(sub => (
+                                  <li
+                                    key={sub.id}
+                                    className="cursor-pointer hover:text-red-500"
+                                  >
+                                    <Link to={"/commerceRroduct"}>
+                                      <NavigationMenuLink onClick={() => setModalC(false)}>
+                                        {sub.subCategoryName}
+                                      </NavigationMenuLink>
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </NavigationMenuContent>
+                          </NavigationMenuItem>
+                        </NavigationMenuList>
+                      </NavigationMenu>
+                    )
+                  })}
+                </div>
+
+
               </ul>
             </div>
           </div>
         </div>
       )}
+      {modalL && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white w-[90%] max-w-[400px] rounded-2xl shadow-xl p-6 animate-fadeIn">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-xl font-semibold text-gray-800">
+                Log out
+              </h1>
+              <CloseOutlined
+                onClick={() => setModalL(false)}
+                className="cursor-pointer text-gray-500 hover:text-black"
+              />
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setModalL(false)}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  setModalL(false);
+                  window.location.reload();
+                }}
+                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+              >
+                Log out
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       <nav className="flex items-center justify-between flex-wrap max-w-[1300px] m-auto p-4">
         <Link to={"/"}>
-        <img src={logo1} alt="" />
+          <img src={logo1} alt="" />
         </Link>
-        <Button onClick={() => setModalC(true)}><DownOutlined  /></Button>
+        <Button onClick={() => setModalC(true)}>Category <DownOutlined /></Button>
         <ul className="hidden md:flex gap-[30px]">
           <Link to={"/"}><li>Home</li></Link>
           <Link to={"/contact"}><li>Contact</li></Link>
           <Link to={"/about"}><li>About</li></Link>
-          <Link to={"/signUp"}><li>Sign Up</li></Link>
+          {!localStorage.getItem("token") && (
+            <Link to={"/signUp"}><li>Sign Up</li></Link>
+          )}
         </ul>
         <div className="md:hidden">
           <MenuOutlined onClick={() => setModal(true)} />
         </div>
-
         <div className="ml-[60px] md:ml-[0] w-[250px]">
-          <Search placeholder="What are you looking for?" />
+          <Search placeholder="What are you looking for?" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <div className="hidden md:flex gap-[20px]">
           <Link to={"/wishlist"} onClick={() => setModal(false)}>
             <img src={logo3} alt="" />
           </Link>
-          <Link to={"/cart"}  onClick={() => setModal(false)}>
+          <Link to={"/cart"} onClick={() => setModal(false)}>
+            {data.map((e) => {
+              return (
+                <div className='absolute top-3.5 ml-[20px] w-[20px] text-white h-[20px] pl-[5px]  rounded-full bg-[red]'>
+                  <h1>{e.totalProducts}</h1>
+                </div>
+              )
+            })}
             <img src={logo6} className='mt-[5px]' alt="" />
           </Link>
-          <Link to={"/account"} onClick={() => setModal(false)}>
-            <img src={logo5} alt="" />
-          </Link>
+
+          {localStorage.getItem("token") && (
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    <Link to={"/account"}>
+                      <img src={logo5} alt="User Account" />
+                    </Link>
+                  </NavigationMenuTrigger>
+
+                  <NavigationMenuContent>
+                    <NavigationMenuLink className="p-2">
+                      <Link to="/account">My Account</Link>
+                    </NavigationMenuLink>
+                    <Link to={"/signUp"}>
+                    <button
+                      onClick={() => setModalL(true)}
+                      className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-600 transition"
+                      >
+                      Log Out
+                    </button>
+                      </Link>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          )}
+
+
+
         </div>
 
       </nav>

@@ -1,90 +1,102 @@
+import React, { useEffect, useState } from 'react'
 import { EyeOutlined, StarOutlined } from '@ant-design/icons'
-import React from 'react'
-import { Link } from 'react-router-dom'
-import logo from "../../img/652e82cd70aa6522dd785109a455904c.png"
-import logo2 from "../../img/Wishlist.png"
+import { Link, useNavigate } from 'react-router-dom'
+import { getWishlist, removeFromWishlist } from "../../utils/wishlist";
+import logo1 from "../../img/5445197.png"
 const Wishlist = () => {
-  return (
-    <div className='max-w-[1300px] m-auto'>
-      <section className='flex justify-between mt-[50px]'>
-        <h1>Wishlist (4)</h1>
-        <button className='border-2 p-[15px] pl-[40px] pr-[40px] rounded-[5px]'>Move All To Bag</button>
-      </section>
-        <div className='flex justify-between mt-[30px] mb-[30px]'>
-          {[1, 2, 3, 4].map((e) => {
-            return (
-              <div className=''>
-                <div className='flex items-start justify-between p-[15px] bg-[#F5F5F5]'>
-                  <img src={logo} alt="" />
-                  <div>
-                  <Link to={"/wishlist"}>
-                    <img src={logo2} alt="" />
-                  </Link>
-                  <Link to={"/productDetails"}>
-                    <EyeOutlined className='ml-[8px]' />
-                  </Link>
-                  </div>
-                </div>
-                <h1>Breed Dry Dog Food</h1>
-                <div className='flex gap-[15px]'>
-                  <h1 className='text-[red]'>$100</h1>
-                  <div className='flex gap-[5px]'>
-                    <StarOutlined />
-                    <StarOutlined />
-                    <StarOutlined />
-                    <StarOutlined />
-                    <StarOutlined />
-                  </div>
-                  <h1 className='text-gray-300'>(35)</h1>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      <section className='max-w-[1300px] m-auto mt-[50px]'>
-        <div className='flex justify-between'>
-          <div className='flex items-center gap-[20px]'>
-            <div className='p-[10px] rounded-[5px] pt-[20px] pb-[12px] bg-[red]'></div>
-            <h1 className='text-[red]'>Just For You</h1>
-          </div>
-          <Link to={"/commerceRroduct"}>
-          <button className='border-2 p-[15px] pl-[40px] pr-[40px] rounded-[5px]'>See All</button>
-          </Link>
-        </div>
-        <div className='flex justify-between mt-[30px] mb-[30px]'>
-          {[1, 2, 3, 4].map((e) => {
-            return (
-              <div className=''>
-                <div className='flex items-start justify-between p-[15px] bg-[#F5F5F5]'>
-                  <img src={logo} alt="" />
-                  <div>
-                  <Link to={"/wishlist"}>
-                    <img src={logo2} alt="" />
-                  </Link>
-                  <Link to={"/productDetails"}>
-                    <EyeOutlined className='ml-[8px]' />
-                  </Link>
-                  </div>
-                </div>
-                <h1>Breed Dry Dog Food</h1>
-                <div className='flex gap-[15px]'>
-                  <h1 className='text-[red]'>$100</h1>
-                  <div className='flex gap-[5px]'>
-                    <StarOutlined />
-                    <StarOutlined />
-                    <StarOutlined />
-                    <StarOutlined />
-                    <StarOutlined />
-                  </div>
-                  <h1 className='text-gray-300'>(35)</h1>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </section>
-    </div>
-  )
-}
+  const [wishlist, setWishlist] = useState([]);
+  let navigate = useNavigate()
+  useEffect(() => {
+    setWishlist(getWishlist());
+  }, []);
 
-export default Wishlist
+  const handleRemove = (id) => {
+    removeFromWishlist(id);
+    setWishlist(getWishlist());
+  };
+
+  return (
+    <div className="max-w-[1300px] m-auto px-4">
+      <section className="flex justify-between items-center mt-12 mb-8">
+        <h1 className="text-2xl font-semibold">
+          Wishlist <span className="text-gray-400">({wishlist.length})</span>
+        </h1>
+      </section>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        {wishlist.map((e) => (
+          <div
+            key={e.id}
+            className="group border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition bg-white"
+          >
+            <div className="relative bg-gray-100 p-6 flex justify-center">
+              <img
+                src={`https://store-api.softclub.tj/images/${e.image}`}
+                className="h-[160px] object-contain group-hover:scale-105 transition"
+                alt=""
+              />
+              <button
+                onClick={() => handleRemove(e.id)}
+                className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-red-500 hover:text-white transition"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4 flex flex-col gap-2">
+              <h1 className="font-medium line-clamp-2">
+                {e.productName}
+              </h1>
+
+              <div className="flex items-center justify-between">
+                <p className="text-red-500 font-semibold">
+                  ${e.price}
+                </p>
+
+                <div className="flex text-yellow-400 text-sm">
+                  <StarOutlined />
+                  <StarOutlined />
+                  <StarOutlined />
+                  <StarOutlined />
+                  <StarOutlined />
+                </div>
+              </div>
+              <Link
+                to={`/productDetails/${e.id}`}
+                className="mt-2 text-center py-2 rounded-lg border hover:bg-black hover:text-white transition"
+              >
+                View Product
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+      {wishlist.length === 0 && (
+        <div className="flex flex-col items-center justify-center mt-20 gap-6">
+          <div className="w-[250px] h-[250px] flex items-center justify-center rounded-full bg-gray-100 shadow-lg p-6">
+            <img
+              src={logo1}
+              alt="Empty Wishlist"
+              className="object-contain w-full h-full"
+            />
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-700">
+            ❤️ Your wishlist is empty
+          </h2>
+          <p className="text-gray-400 text-center max-w-[400px]">
+            You haven’t added any products to your wishlist yet. Browse our store and start adding your favorites!
+          </p>
+          <button
+            className="mt-4 px-6 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition"
+            onClick={()=>navigate(-1)}
+            >
+              Go Back
+            </button>
+             
+        </div>
+      )}
+
+    </div>
+
+  );
+};
+
+export default Wishlist;

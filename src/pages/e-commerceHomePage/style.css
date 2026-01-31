@@ -1,0 +1,39 @@
+
+.image-container {
+  position: relative; 
+  overflow: hidden;
+  height: 180px;
+  
+}
+
+.add-to-cart {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 15px;
+  cursor: pointer;
+  
+  opacity: 0; 
+  transform: translateY(100%);
+  transition: all 0.3s ease;
+}
+
+.image-container:hover .add-to-cart {
+  opacity: 1;
+  transform: translateY(0);
+}
+.product-card {
+  width: 250px; 
+  background-color: #f9f9f9;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  
+}

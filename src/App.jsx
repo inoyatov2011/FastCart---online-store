@@ -12,13 +12,14 @@ import About from './pages/about/about'
 import Contact from './pages/contact/contact'
 import LogIn from './pages/logIn/logIn'
 import SignUp from './pages/signUp/signUp'
+import { ToastContainer } from "react-toastify";
 const App = () => {
   let router = createBrowserRouter(createRoutesFromElements(
     <Route path='/' element={<Layout/>}>
       <Route index element={<CommerceHomePage/>}/>
       <Route path='/commerceRroduct' element={<CommerceProduct/>}/>
       <Route path='/wishlist' element={<Wishlist/>}/>
-      <Route path='/productDetails' element={<ProductDetailsPage/>}/>
+      <Route path='/productDetails/:id' element={<ProductDetailsPage/>}/>
       <Route path='/cart' element={<Cart/>}/>
       <Route path='/checkOut' element={<CheckOut/>}/>
       <Route path='/account' element={<Account/>}/>
@@ -31,6 +32,7 @@ const App = () => {
   return (
     <div>
       <RouterProvider router={router}/>
+       <ToastContainer position="top-right" autoClose={2000} />
     </div>
   )
 }
